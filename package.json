@@ -37,8 +37,8 @@
       }
     }
   },
-  "main": "dist/queued.js",
-  "typings": "dist/queued.d.ts",
+  "main": "dist/createQueue.js",
+  "typings": "dist/createQueue.d.ts",
   "license": "MIT",
   "files": [
     "dist/"

@@ -16,5 +16,5 @@
     "pretty": true,
     "jsx": "react"
   },
-  "include": ["src/useCollapsible.tsx"]
+  "include": ["src/createQueue.ts"]
 }
