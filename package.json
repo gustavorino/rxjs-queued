@@ -1,34 +1,28 @@
 {
-  "name": "react-hook-collapse",
-  "version": "0.0.12",
+  "name": "rxjs-queued",
+  "version": "0.0.1",
   "author": {
     "name": "Gustavo Bremm",
     "url": "https://github.com/gustavorino"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gustavorino/react-hook-collapse"
+    "url": "https://github.com/gustavorino/rxjs-queued"
   },
   "bugs": {
-    "url": "https://github.com/gustavorino/react-hook-collapse/issues"
+    "url": "https://github.com/gustavorino/rxjs-queued/issues"
   },
   "keywords": [
-    "collapse",
-    "react",
-    "collapsible",
-    "animate",
-    "height",
-    "accordion",
-    "expand",
-    "hooks",
-    "animate-height",
-    "css"
+    "rxjs",
+    "queue",
+    "stack",
+    "http"
   ],
   "engines": {
     "node": ">=10"
   },
   "scripts": {
-    "start": "parcel src/index.html",
+    "start": "rm -rf .parcel-cache && parcel src/index.html --dist-dir ./docs",
     "build": "./scripts/clean.sh && tsc -p .",
     "build-docs": "rm -rf .parcel-cache docs && parcel build src/index.html --dist-dir ./docs --public-url . --target docs",
     "test": "echo 0"
@@ -43,14 +37,15 @@
       }
     }
   },
-  "main": "dist/useCollapsible.js",
-  "typings": "dist/useCollapsible.d.ts",
+  "main": "dist/queued.js",
+  "typings": "dist/queued.d.ts",
   "license": "MIT",
   "files": [
     "dist/"
   ],
   "peerDependencies": {
-    "react": "^17.0.0"
+    "react": "^17.0.0",
+    "rxjs": "^6.0.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.3",
@@ -63,7 +58,11 @@
     "react-icons": "^4.2.0",
     "tailwindcss": "^2.0.4",
     "typescript": "^4.2.3",
-    "react": "^17.0.0"
+    "react": "^17.0.0",
+    "rxjs": "6.6.7"
   },
-  "dependencies": {}
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  }
 }

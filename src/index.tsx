@@ -8,15 +8,15 @@ function Main() {
     <main className="">
       <div className="bg-sienna text-cream">
         <div className="container mx-auto p-5 ">
-          <h1 className="text-4xl my-3">React Hook Collapse</h1>
+          <h1 className="text-4xl my-3">RXJS Queued</h1>
           <code className="bg-black bg-opacity-20 p-3 inline-block my-3 text-sm text-opacity-80 text-white">
-            npm install react-hook-collapse
+            npm install rxjs-queued
           </code>
           <div className="flex space-x-3">
             <a
               className="text-white inline-flex items-center border border-white border-opacity-30 rounded-md p-2"
               target="_blank"
-              href="https://github.com/gustavorino/react-hook-collapse"
+              href="https://github.com/gustavorino/rxjs-queued"
             >
               <AiFillGithub className="mr-2 text-tangerine" />
               Github
@@ -24,7 +24,7 @@ function Main() {
             <a
               className="text-white inline-flex items-center border border-white border-opacity-30 rounded-md p-2"
               target="_blank"
-              href="https://github.com/gustavorino/react-hook-collapse/issues/new"
+              href="https://github.com/gustavorino/rxjs-queued/issues/new"
             >
               <AiFillBug className="mr-2 text-tangerine" />
               Issues

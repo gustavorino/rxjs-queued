@@ -1,66 +1,108 @@
-import React, { useRef, useState } from 'react';
-import { Button } from '../components/Button';
-import useCollapsible from '../useCollapsible';
+import React, { useEffect, useState } from 'react';
+import { Observable, of, Subject } from 'rxjs';
+import { delay, delayWhen, finalize, mergeMapTo } from 'rxjs/operators';
 
-const TEXT_STYLES = ['text-xs', 'text-xl', 'text-3xl'];
+type PendingObservable = Observable<any>;
+type PendingSubject = Subject<any>;
+type PendingType = PendingSubject | PendingObservable;
 
-function getTextStyles(i) {
-  return TEXT_STYLES[i % TEXT_STYLES.length];
+function createQueue() {
+  let pending: PendingType = of(null);
+
+  const getPrevious = () => {
+    return pending;
+  };
+
+  const finish = (pendingSubject: PendingSubject) => {
+    if (pending === pendingSubject) {
+      pending = of(null);
+    }
+    if (pendingSubject.next) {
+      pendingSubject.next('onComplete');
+      pendingSubject.complete();
+    }
+  };
+
+  const createPendingSubject = () => {
+    pending = new Subject();
+    return pending;
+  };
+
+  const getSubjects = () => {
+    return [getPrevious(), createPendingSubject()];
+  };
+
+  return function () {
+    return function <T>(source: Observable<T>) {
+      // get a previous pending subject or of(null) when it's the first one
+      const [prevSubject, currentSubject] = getSubjects();
+
+      return of(null).pipe(
+        delayWhen(() => prevSubject),
+        mergeMapTo(
+          source.pipe(
+            finalize(() => {
+              finish(currentSubject as PendingSubject);
+            })
+          )
+        )
+      );
+    };
+  };
 }
 
 export default function Example1() {
-  const ref = useRef<HTMLDivElement>();
-  const [state, setState] = useState(true);
-  const [items, setItems] = useState(5);
-
-  useCollapsible(ref, state);
-
+  const [state, setState] = useState(0);
   return (
     <div>
-      <div className="flex space-x-3 my-3">
-        <Button
-          onClick={() => {
-            setState(!state);
-          }}
-          disabled={items > 30}
-        >
-          Expand / Collapse
-        </Button>
-        <Button
-          onClick={() => {
-            setItems(items + 1);
-          }}
-        >
-          Add item
-        </Button>
-        <Button
-          disabled={items <= 1}
-          onClick={() => {
-            setItems(items - 1);
-          }}
-        >
-          Remove Item
-        </Button>
+      <div>
+        <div className="bg-black bg-opacity-5 rounded-md text-opacity-50 text-black inline-block p-4">
+          of('done').pipe(delay(1000), myQueue())
+        </div>
       </div>
-      <div
-        ref={ref}
-        className="overflow-hidden duration-500 bg-cream mt-3 divide-y-2 divide-tangerine divide-opacity-50"
+      <button
+        className="bg-maroon text-white p-2 mt-4 mb-4"
+        onClick={() => {
+          setState(state + 1);
+        }}
       >
-        {Array(items)
+        Add more
+      </button>
+
+      <div className="">
+        {Array(state)
           .fill(0)
-          .map((_, i) => {
-            return (
-              <div key={i} className={'p-3 text-maroon ' + getTextStyles(i)}>
-                {i + 1} - Lorem ipsum dolor sit amet, consectetur adipiscing
-                elit. Nunc ornare convallis finibus. Aliquam arcu sapien, porta
-                malesuada sagittis rhoncus, auctor at magna. Suspendisse
-                potenti. Ut vel euismod elit. Morbi ac neque vitae dolor
-                vestibulum auctor. Curabitur sed bibendum ex. Nulla hendrerit
-                dui metus, et rhoncus neque faucibus eu.
-              </div>
-            );
+          .map((v, i) => {
+            return <Request key={i} />;
           })}
       </div>
+    </div>
+  );
+}
+
+const myQueue = createQueue();
+
+function getData() {
+  return of('done').pipe(delay(1000), myQueue());
+}
+
+function Request() {
+  const [state, setState] = useState<any>(null);
+
+  const className = !state
+    ? 'p-2 my-2 bg-black bg-opacity-10'
+    : 'p-2 my-2 bg-tangerine text-black';
+  useEffect(() => {
+    getData()
+      .toPromise()
+      .then((v) => {
+        setState(v);
+      });
+  }, []);
+
+  return (
+    <div className={className}>
+      State: <b>{state || 'waiting'}</b>
     </div>
   );
 }

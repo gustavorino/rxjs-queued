@@ -1,92 +1,59 @@
-# REACT HOOK COLLAPSE
+# RXJS queued
 
-> A lighweight and minimalist HTML react hook collapsible that uses CSS transitions
+> A factory to create a queue operator that stacks multiple observables from different streams
+
+It will postpone the subscription of next observable until the previous observable is completed.
+
+It can be shared across different kind of streams.
+
+## Motivation
+
+I was working on an Angular application where certain backend endpoints could not be called concurrently due to a flawed backend architecture.
+
+Subscriptions to these api endpoints were coming from different angular components and services so I wanted to find an elegant solution that would ensure these endpoints were always called in sequence.
 
 ## Installation
 
 ```bash
-$ npm install react-hook-collapse
+$ npm install rxjs-queued
 ```
-
----
-
-## [Examples](https://gustavorino.github.io/react-hook-collapse/)
-
----
 
 ## Usage
 
-Example #1 - using Ref and Hook:
-
 ```js
-import useCollapse, { Collapsible } from 'react-hook-collapse';
-import React, { useState, useRef } from 'react';
+import createQueue from 'rxjs-queued';
 
-function MyComponent() {
-  const ref = useRef();
-  const [state, setState] = useState(false);
-  useCollapse(ref, state);
+const queue = createQueue();
 
-  return (
-    <section>
-      <button
-        onClick={() => {
-          setState(!state);
-        }}
-      >
-        Toggle
-      </button>
-      <div ref={ref} style={{ overflow: 'hidden', transition: '0.3s' }}>
-        ...content...
-      </div>
-    </section>
-  );
-}
+const stream1$ = of(1).pipe(delay(500), queue());
+const stream2$ = of(2).pipe(delay(500), queue());
+const stream3$ = of(3).pipe(
+  delay(500),
+  tap(() => {
+    throw new Error('ops');
+  }),
+  queue()
+);
+const stream4$ = of(4).pipe(delay(500), queue());
+
+stream1$.subscribe((v) => {
+  console.log('stream1$', v);
+});
+stream2$.subscribe((v) => {
+  console.log('stream2$', v);
+});
+stream3$.subscribe((v) => {
+  console.log('stream3$', v);
+});
+stream4$.subscribe((v) => {
+  console.log('stream4$', v);
+});
+
+/*
+Output       |  Time
+stream1$ 1   |  500ms
+stream2$ 2   |  1000ms
+Error: ops   |  1500ms
+stream4$ 4   |  2000ms
+*/
 ```
-
-Example #2 - using the baked Collapsible component:
-
-```js
-import { Collapsible } from 'react-hook-collapse';
-import React, { useState, useRef } from 'react';
-
-function MyComponent() {
-  const [state, setState] = useState(false);
-
-  return (
-    <section>
-      <button
-        onClick={() => {
-          setState(!state);
-        }}
-      >
-        Toggle
-      </button>
-      <Collapsible
-        expanded={state}
-        style={{ overflow: 'hidden', transition: '0.3s' }}
-      >
-        ...content...
-      </Collapsible>
-    </section>
-  );
-}
-```
-
----
-
-## Features
-
-- CSS transition based, you can set the animation duration using your favorite CSS framework.
-- Performs better than JS based animations.
-- No CSS Classes, no external styles.
-- Zero dependency
-- Doesn't manipulate component Props.
-- Doesn't stack animations on fast toggle.
-- Doesn't lock the mask height. Sets to 'auto' when animation is finished.
-
----
-
-## Browser support
-
-https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/transitionend_event#browser_compatibility
