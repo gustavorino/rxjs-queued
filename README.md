@@ -10,7 +10,7 @@ It can be shared across different kind of streams.
 
 I was working on an Angular application where certain backend endpoints could not be called concurrently due to a flawed backend architecture.
 
-Subscriptions to these api endpoints were coming from different angular components and services so I wanted to find an elegant solution that would sync these HTTP requests using a queue.
+Subscriptions to these api endpoints were coming from different angular components/services so I wanted to find an elegant solution to sync these HTTP requests using a queue.
 
 ![rxjs-queue being used to sync http requests ](./assets/waterfall.jpg)
 
